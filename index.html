@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        /* Original CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #343541;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #d1d5db;
+            margin: 0;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-color: #40414f;
+            position: relative;
+            margin-bottom: 15px; /* Space between chat-container and footer */
+            flex-grow: 1;
+        }
+
+        #chatbox {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scrollbar-width: thin;
+            background-color: #343541;
+            border-bottom: 1px solid #50545f;
+            margin:0;
+        }
+
+        /* Style for the chatbot name */
+        #chatbot-name {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #d1d5db;
+            font-weight: bold;
+        }
+
+        #input-container {
+            display: flex;
+            padding: 10px;
+            gap: 8px;
+            background-color: #40414f;
+            border-top: 1px solid #50545f;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            padding: 12px;
+            font-size: 16px;
+            color: #d1d5db;
+            background-color: #40414f;
+            border: 1px solid #5f6368;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 16px;
+            background-color: #10a37f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0e8d6e;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            max-width: 80%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        .user-message {
+            background-color: #1e293b;
+            color: #d1d5db;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #3b4252;
+            color: #eceff4;
+            align-self: flex-start;
+            text-align: left;
+         /* Ensure no extra spacing in responses */
+            margin: 0; /* Remove any extra space above or below */
+            padding: 12px;
+            border-radius: 6px;
+            max-width: 80%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        /* Icons container */
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            font-size: 14px;
+            color: #eceff4;
+            cursor: pointer;
+        }
+
+        .icon {
+            padding: 4px;
+            border-radius: 50%;
+            background-color: #5e6775;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .icon:hover {
+            background-color: #757c8a;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            #chat-container {
+                width: 100%;
+                height: 100vh;
+                max-width: 100%;
+            }
+
+            #chatbox {
+                padding: 10px;
+            }
+
+            #input-container {
+                padding: 8px;
+            }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+           
+        }
+
+        .footer {
+            background-color: #202123; /* Dark background to match the body */
+            color: #d1d5db; /* Light text color for contrast */
+            text-align: center; /* Center the text */
+            padding: 15px 0; /* Padding for spacing */
+            border-top: 1px solid #50545f; /* Subtle top border for separation */
+            width: 100%; /* Full width */
+            position: relative;
+        }
+
+        .footer p {
+            margin: 5px 0; /* Margin between paragraphs */
+            font-size: 14px; /* Font size for readability */
+        }
+
+        .footer strong {
+            color: #10a37f; /* Change the link color to match your theme */
+        }
+
+    </style>
+</head>
+<body>
+        <div id="chatbot-name">chatbot AI 2024</div>
+        <div id="chat-container">
+            <div id="chatbox"></div>
+            <div id="input-container">
+                <input type="text" id="userInput" placeholder="Type a message..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            
+            <footer class="footer">
+                <p>Created by <strong>Developers</strong></p>
+                <p>All rights are reserved by <strong>Amulyam Enterprises 2024</strong></p>
+            </footer>
+        </div>
+        
+
+
+    <script>
+        let lastUserMessage = '';  // Store the last user's message for editing
+
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+            
+            if (message) {
+                const chatbox = document.getElementById('chatbox');
+                
+                // Append the user message
+                chatbox.innerHTML += `<div class="message user-message">${message}</div>`;
+                
+                // Store the last user's message for editing
+                lastUserMessage = message;
+
+                // Scroll to the latest message
+                chatbox.scrollTop = chatbox.scrollHeight;
+                
+                // Clear the input
+                userInput.value = '';
+                
+                // Send the message to the backend
+                try {
+                    const response = await fetch('http://localhost:3000/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message }),
+                    });
+                    const data = await response.json();
+                    
+                    // Append the bot response with action icons
+                    chatbox.innerHTML += `
+                        <div class="message bot-message">
+                            ${data.reply}
+                            <div class="action-icons">
+                                <span class="icon" onclick="copyMessage(this)">📋</span>
+                                <span class="icon" onclick="editLastUserMessage()">✏️</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Scroll to the latest message
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                } catch (error) {
+                    console.error('Error:', error);
+                    chatbox.innerHTML += `<div class="message bot-message">Error: Unable to connect to server.</div>`;
+                }
+            }
+        }
+
+        // Copy message to clipboard
+        function copyMessage(icon) {
+            const messageContent = icon.closest('.bot-message').innerText.trim();
+            navigator.clipboard.writeText(messageContent).then(() => {
+                alert('Message copied to clipboard');
+            }).catch(err => {
+                console.error('Error copying message:', err);
+            });
+        }
+
+        // Edit last user's message by placing it in the input field
+        function editLastUserMessage() {
+            if (lastUserMessage) {
+                document.getElementById('userInput').value = lastUserMessage;
+            }
+        }
+
+        // Handle Enter key to send message
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+    
+    
+    
+</body>
+</html>
+
+
+
+
+
+
